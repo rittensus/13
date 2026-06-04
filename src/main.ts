@@ -14,7 +14,8 @@ import {
   playClick,
   playChime,
   playBuzz,
-  resumeAudio
+  resumeAudio,
+  playVictoryFanfare
 } from './audio.js';
 
 const app = document.getElementById('app')!;
@@ -128,6 +129,11 @@ function triggerSoundCues(room: GameRoom) {
     if (wasTradeMade) {
       playChime();
     }
+  }
+
+  // 4. Game Over / Victory Fanfare
+  if (room.status === 'GAMEOVER' && previousStatus !== 'GAMEOVER') {
+    playVictoryFanfare();
   }
 
   // Save states

@@ -671,7 +671,9 @@ body, html {
   border-left: 1px solid rgba(213, 178, 99, 0.15);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 .side-header {
@@ -698,6 +700,7 @@ body, html {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
+  min-height: 0;
   font-size: 0.85rem;
   line-height: 1.5;
   display: flex;
@@ -1065,6 +1068,8 @@ body, html {
   .side-panel {
     border-left: none;
     border-top: 1px solid rgba(213, 178, 99, 0.15);
+    height: 180px;
+    max-height: 180px;
   }
 }
 
@@ -1645,5 +1650,22 @@ body, html {
 
 body:has(.dev-sandbox-bar) #app {
   padding-top: 50px;
+}
+
+/* Play card fly-in animation using custom properties from JS */
+.played-card {
+  animation: playCardAnim 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  transform-origin: center center;
+}
+
+@keyframes playCardAnim {
+  0% {
+    opacity: 0;
+    transform: translate(var(--play-origin-x, 0px), var(--play-origin-y, 250px)) scale(1.3) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(var(--play-offset-x, 0px), var(--play-offset-y, 0px)) rotate(var(--play-angle, 0deg)) scale(1);
+  }
 }
 

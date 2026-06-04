@@ -1,5 +1,6 @@
 import type { GameRoom, Player, Card, TradeOffer, Suit } from './types.js';
 import { isValidPlay } from './rules.js';
+import { playCardSelect } from './audio.js';
 
 // Global error alert timer
 let errorTimeout: number | null = null;
@@ -416,7 +417,25 @@ export function renderGameScreen(
     }
   } else if (room.lastPlay.length > 0) {
     discardEl.innerHTML = '';
-    // Show cards in a clean, fully-offset fan so values are clearly readable
+    
+    // Find the relative seat index of the last player to animate from their position (0=bottom, 1=left, 2=top, 3=right)
+    const lastPlayer = room.players.find(p => p.id === room.lastPlayerId);
+    const lastPlayerSeat = lastPlayer ? lastPlayer.seatIndex : 0;
+    const relativeSeatIndex = (lastPlayerSeat - mySeat + 4) % 4;
+
+    let originX = 0;
+    let originY = 250;
+    if (relativeSeatIndex === 1) {
+      originX = -350;
+      originY = 0;
+    } else if (relativeSeatIndex === 2) {
+      originX = 0;
+      originY = -250;
+    } else if (relativeSeatIndex === 3) {
+      originX = 350;
+      originY = 0;
+    }
+
     room.lastPlay.forEach((card, index) => {
       const cardEl = createCardElement(card, false);
       cardEl.className = `${cardEl.className} played-card`;
@@ -424,7 +443,17 @@ export function renderGameScreen(
       const angle = -10 + (index * 8);
       const offsetX = -25 + (index * 25);
       const offsetY = -5 + (index * 2);
+
+      // Set inline custom variables for CSS translation animation origins & targets
+      cardEl.style.setProperty('--play-origin-x', `${originX}px`);
+      cardEl.style.setProperty('--play-origin-y', `${originY}px`);
+      cardEl.style.setProperty('--play-offset-x', `${offsetX}px`);
+      cardEl.style.setProperty('--play-offset-y', `${offsetY}px`);
+      cardEl.style.setProperty('--play-angle', `${angle}deg`);
+
+      // Fallback direct styling
       cardEl.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${angle}deg)`;
+
       discardEl.appendChild(cardEl);
     });
   }
@@ -498,6 +527,7 @@ export function renderGameScreen(
       pBottom.cards.forEach(card => {
         const cardEl = createCardElement(card);
         cardEl.addEventListener('click', () => {
+          playCardSelect();
           const wasSelected = cardEl.classList.contains('selected');
           cardsContainer.querySelectorAll('.card').forEach(el => el.classList.remove('selected'));
           if (!wasSelected) {
@@ -597,6 +627,7 @@ export function renderGameScreen(
       pBottom.cards.forEach(card => {
         const cardEl = createCardElement(card);
         cardEl.addEventListener('click', () => {
+          playCardSelect();
           cardEl.classList.toggle('selected');
           updatePlayButtonState();
         });

@@ -159,3 +159,58 @@ export function resumeAudio() {
     ctx.resume();
   }
 }
+
+// 7. Quiet soft tap when selecting a card in hand
+export function playCardSelect() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.03);
+
+  gain.gain.setValueAtTime(0.04, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.03);
+}
+
+// 8. Triumphant Major Arpeggio Fanfare when winning the game
+export function playVictoryFanfare() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  const playNote = (freq: number, delay: number, dur: number, vol = 0.08) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now + delay);
+
+    gain.gain.setValueAtTime(0, now + delay);
+    gain.gain.linearRampToValueAtTime(vol, now + delay + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now + delay);
+    osc.stop(now + delay + dur);
+  };
+
+  playNote(261.63, 0, 0.4);      // C4
+  playNote(329.63, 0.08, 0.4);   // E4
+  playNote(392.00, 0.16, 0.4);   // G4
+  playNote(523.25, 0.24, 0.5);   // C5
+  playNote(659.25, 0.36, 0.5);   // E5
+  playNote(783.99, 0.48, 0.7);   // G5
+  playNote(1046.50, 0.60, 1.2, 0.12); // C6
+}

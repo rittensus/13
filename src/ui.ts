@@ -64,6 +64,14 @@ let isDevMode = false;
 let onReRenderCallback: (() => void) | null = null;
 let selectedWants: { rank: number | null; suit: Suit | null } = { rank: null, suit: null };
 
+interface PlayHistoryItem {
+  cards: Card[];
+  playerId: string | null;
+  hasAnimated: boolean;
+}
+let currentRoundPlays: PlayHistoryItem[] = [];
+let lastRenderedPlaySignature = '';
+
 export function setReRenderCallback(cb: () => void) {
   onReRenderCallback = cb;
 }
@@ -304,6 +312,30 @@ export function renderGameScreen(
   // Validate selected offer still exists
   if (selectedOfferId && !activeTradeOffers.some(o => o.id === selectedOfferId)) {
     selectedOfferId = null;
+  }
+
+  // Manage current round play history
+  if (room.status !== 'PLAYING') {
+    currentRoundPlays = [];
+    lastRenderedPlaySignature = '';
+  } else if (room.lastPlay.length === 0) {
+    currentRoundPlays = [];
+    lastRenderedPlaySignature = '';
+  } else {
+    const playSignature = room.lastPlay.map(c => c.id).join(',');
+    if (playSignature !== lastRenderedPlaySignature) {
+      const latestSig = currentRoundPlays.length > 0 
+        ? currentRoundPlays[currentRoundPlays.length - 1].cards.map(c => c.id).join(',')
+        : '';
+      if (playSignature !== latestSig) {
+        currentRoundPlays.push({
+          cards: [...room.lastPlay],
+          playerId: room.lastPlayerId,
+          hasAnimated: false
+        });
+      }
+      lastRenderedPlaySignature = playSignature;
+    }
   }
 
   // 1. Identify seats
@@ -554,47 +586,67 @@ export function renderGameScreen(
         onCancelBid(offerId);
       });
     }
-  } else if (room.lastPlay.length > 0) {
+  } else if (room.lastPlay.length > 0 && currentRoundPlays.length > 0) {
     discardEl.innerHTML = '';
-    
-    // Find the relative seat index of the last player to animate from their position (0=bottom, 1=left, 2=top, 3=right)
-    const lastPlayer = room.players.find(p => p.id === room.lastPlayerId);
-    const lastPlayerSeat = lastPlayer ? lastPlayer.seatIndex : 0;
-    const relativeSeatIndex = (lastPlayerSeat - mySeat + 4) % 4;
 
-    let originX = 0;
-    let originY = 250;
-    if (relativeSeatIndex === 1) {
-      originX = -350;
-      originY = 0;
-    } else if (relativeSeatIndex === 2) {
-      originX = 0;
-      originY = -250;
-    } else if (relativeSeatIndex === 3) {
-      originX = 350;
-      originY = 0;
-    }
+    currentRoundPlays.forEach((play, playIdx) => {
+      const isLatest = (playIdx === currentRoundPlays.length - 1);
+      const animateThisPlay = isLatest && !play.hasAnimated;
 
-    room.lastPlay.forEach((card, index) => {
-      const cardEl = createCardElement(card, false);
-      cardEl.className = `${cardEl.className} played-card`;
-      // High readability offsets
-      const angle = -10 + (index * 8);
-      const offsetX = -25 + (index * 25);
-      const offsetY = -5 + (index * 2);
+      // Find the relative seat index of the player to animate from their position
+      let originX = 0;
+      let originY = 250;
+      if (animateThisPlay) {
+        const lastPlayer = room.players.find(p => p.id === play.playerId);
+        const lastPlayerSeat = lastPlayer ? lastPlayer.seatIndex : 0;
+        const relativeSeatIndex = (lastPlayerSeat - mySeat + 4) % 4;
+        if (relativeSeatIndex === 1) {
+          originX = -350;
+          originY = 0;
+        } else if (relativeSeatIndex === 2) {
+          originX = 0;
+          originY = -250;
+        } else if (relativeSeatIndex === 3) {
+          originX = 350;
+          originY = 0;
+        }
+      }
 
-      // Set inline custom variables for CSS translation animation origins & targets
-      cardEl.style.setProperty('--play-origin-x', `${originX}px`);
-      cardEl.style.setProperty('--play-origin-y', `${originY}px`);
-      cardEl.style.setProperty('--play-offset-x', `${offsetX}px`);
-      cardEl.style.setProperty('--play-offset-y', `${offsetY}px`);
-      cardEl.style.setProperty('--play-angle', `${angle}deg`);
-      cardEl.style.animationDelay = `${index * 80}ms`;
+      // Visual stack offset for older plays in same round
+      const playOffsetCount = currentRoundPlays.length - 1 - playIdx;
+      const playShiftX = -12 * playOffsetCount;
+      const playShiftY = -6 * playOffsetCount;
 
-      // Fallback direct styling
-      cardEl.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${angle}deg)`;
+      play.cards.forEach((card, cardIdx) => {
+        const cardEl = createCardElement(card, false);
 
-      discardEl.appendChild(cardEl);
+        const angle = -10 + (cardIdx * 8);
+        const offsetX = -25 + (cardIdx * 25) + playShiftX;
+        const offsetY = -5 + (cardIdx * 2) + playShiftY;
+
+        if (animateThisPlay) {
+          cardEl.className = `${cardEl.className} played-card`;
+          cardEl.style.setProperty('--play-origin-x', `${originX}px`);
+          cardEl.style.setProperty('--play-origin-y', `${originY}px`);
+          cardEl.style.setProperty('--play-offset-x', `${offsetX}px`);
+          cardEl.style.setProperty('--play-offset-y', `${offsetY}px`);
+          cardEl.style.setProperty('--play-angle', `${angle}deg`);
+          cardEl.style.animationDelay = `${cardIdx * 80}ms`;
+        } else if (isLatest) {
+          cardEl.className = `${cardEl.className} played-card-static`;
+        } else {
+          cardEl.className = `${cardEl.className} played-card-history`;
+        }
+
+        // Set static transform positioning
+        cardEl.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${angle}deg)`;
+        discardEl.appendChild(cardEl);
+      });
+
+      // Mark this play as animated so it remains static on subsequent re-renders
+      if (isLatest) {
+        play.hasAnimated = true;
+      }
     });
   }
 

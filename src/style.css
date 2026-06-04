@@ -563,7 +563,7 @@ body, html {
   height: 100%;
 }
 
-.played-card {
+.played-card, .played-card-static, .played-card-history {
   width: 80px;
   height: 116px;
   background: #fff;
@@ -574,20 +574,26 @@ body, html {
   pointer-events: none;
 }
 
-.played-card .card-inner {
+.played-card .card-inner, .played-card-static .card-inner, .played-card-history .card-inner {
   padding: 6px;
 }
 
-.played-card .card-value {
+.played-card .card-value, .played-card-static .card-value, .played-card-history .card-value {
   font-size: 1.2rem;
 }
 
-.played-card .card-suit {
+.played-card .card-suit, .played-card-static .card-suit, .played-card-history .card-suit {
   font-size: 1rem;
 }
 
-.played-card .card-center-suit {
+.played-card .card-center-suit, .played-card-static .card-center-suit, .played-card-history .card-center-suit {
   font-size: 2.2rem;
+}
+
+.played-card-history {
+  opacity: 0.22;
+  filter: grayscale(40%) contrast(90%);
+  transform-origin: center center;
 }
 
 .deck-pile-center {

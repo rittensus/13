@@ -1,0 +1,1649 @@
+/* Design System for Tiến Lên Classic */
+
+:root {
+  --table-felt: radial-gradient(circle, #0e4428 0%, #061f12 100%);
+  --wood-border: #2c1a0e;
+  --gold-accent: #d5b263;
+  --gold-hover: #bfa156;
+  --gold-light: rgba(213, 178, 99, 0.15);
+  --panel-bg: rgba(10, 22, 16, 0.75);
+  --border-color: rgba(213, 178, 99, 0.2);
+  --text-primary: #f7f4eb;
+  --text-secondary: #c2bdb0;
+  --red-suit: #c92d39;
+  --black-suit: #1c1e21;
+  --card-width: 100px;
+  --card-height: 145px;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 20px 35px rgba(0, 0, 0, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background-color: #050a07;
+  color: var(--text-primary);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Welcome / Lobby Screens
+   ========================================================================== */
+
+.welcome-screen, .lobby-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--table-felt);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Elegant wood border overlay for welcome/lobby screens */
+.welcome-screen::after, .lobby-screen::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border: 4px double var(--gold-accent);
+  pointer-events: none;
+  opacity: 0.4;
+  border-radius: 8px;
+}
+
+.welcome-card, .lobby-card {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  z-index: 10;
+}
+
+.welcome-card h1, .lobby-card h2 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--gold-accent);
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.lobby-card h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.input-group input, .input-group select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(213, 178, 99, 0.3);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus, .input-group select:focus {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 10px rgba(213, 178, 99, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, var(--gold-accent) 0%, #bfa156 100%);
+  border: none;
+  border-radius: 6px;
+  color: #0b1a13;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(213, 178, 99, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(213, 178, 99, 0.45);
+  background: linear-gradient(135deg, #e3c073 0%, var(--gold-hover) 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px 28px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-secondary:hover {
+  background: var(--gold-light);
+  border-color: var(--gold-accent);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(213, 178, 99, 0.15);
+}
+
+.divider:not(:empty)::before {
+  margin-right: .75em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: .75em;
+}
+
+.room-code-display {
+  background: rgba(213, 178, 99, 0.1);
+  border: 1px dashed var(--gold-accent);
+  padding: 15px;
+  border-radius: 6px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--gold-accent);
+  margin-bottom: 25px;
+  text-transform: uppercase;
+}
+
+.lobby-players {
+  width: 100%;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.lobby-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(213, 178, 99, 0.1);
+}
+
+.lobby-player-row:last-child {
+  border-bottom: none;
+}
+
+.player-info-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-status-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.player-status-badge.ready {
+  background: rgba(46, 117, 89, 0.25);
+  color: #52c49c;
+  border: 1px solid rgba(82, 196, 156, 0.4);
+}
+
+.player-status-badge.waiting {
+  background: rgba(186, 131, 48, 0.25);
+  color: #fab555;
+  border: 1px solid rgba(250, 181, 85, 0.4);
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #c92d39;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.remove-btn:hover {
+  color: #ff4a5a;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Game Table Screen
+   ========================================================================== */
+
+.game-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--table-felt);
+  display: grid;
+  grid-template-columns: 1fr 320px; /* Table left, logs right */
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+}
+
+.table-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Elegant felt pattern overlays */
+.table-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.table-outer-wood {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 16px solid var(--wood-border);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.9);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Seats layout in a circle */
+.seat {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.seat.bottom {
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+}
+
+.seat.top {
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.seat.left {
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.seat.right {
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.player-panel {
+  background: rgba(10, 22, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 16px;
+  min-width: 140px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.player-panel.active-turn {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 15px rgba(213, 178, 99, 0.45);
+}
+
+.player-panel.active-turn::after {
+  content: '▼';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--gold-accent);
+  font-size: 0.8rem;
+  animation: bounce 1s infinite alternate;
+}
+
+.player-panel.passed {
+  opacity: 0.55;
+  background: rgba(20, 20, 20, 0.8);
+}
+
+.player-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.player-panel.active-turn .player-name {
+  color: var(--gold-accent);
+}
+
+.player-card-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.passed-indicator {
+  position: absolute;
+  top: -24px;
+  background: #c92d39;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Card layout on seat panels (for AI - compact card backs representation) */
+.ai-cards-back {
+  display: flex;
+  margin-top: 8px;
+  gap: -15px; /* overlap cards */
+}
+
+.ai-card-back-mini {
+  width: 16px;
+  height: 24px;
+  border-radius: 2px;
+  background: #9e1c25;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   Classic Playing Cards
+   ========================================================================== */
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: -25px; /* overlap cards */
+  margin-top: 15px;
+  padding: 10px 40px;
+  max-width: 100%;
+  perspective: 1000px;
+}
+
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: #fff;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+  user-select: none;
+  font-family: var(--font-sans);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  /* Make overlapping look premium */
+  margin-left: -35px;
+}
+
+.card:first-child {
+  margin-left: 0;
+}
+
+/* Suit Color Rules */
+.card.suit-hearts, .card.suit-diamonds {
+  color: var(--red-suit);
+}
+
+.card.suit-spades, .card.suit-clubs {
+  color: var(--black-suit);
+}
+
+/* Inner card styling */
+.card-inner {
+  padding: 8px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.card-suit {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.card-center-suit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  opacity: 0.15;
+}
+
+/* Card Hover and 3D Tilt */
+.card:hover {
+  transform: translateY(-20px) rotateX(10deg) scale(1.05);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 100;
+}
+
+/* Selected state (player ready to play card) */
+.card.selected {
+  transform: translateY(-35px) scale(1.03);
+  box-shadow: 0 0 15px rgba(82, 196, 156, 0.5), var(--shadow-card-hover);
+  border: 2px solid #52c49c;
+  z-index: 90;
+}
+
+.card.selected:hover {
+  transform: translateY(-40px) scale(1.05);
+  z-index: 100;
+}
+
+/* ==========================================================================
+   Center Table Area (Discard Pile)
+   ========================================================================== */
+
+.center-felt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(213, 178, 99, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 8;
+}
+
+.discard-pile {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.played-card {
+  width: 80px;
+  height: 116px;
+  background: #fff;
+  border-radius: 6px;
+  position: absolute;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+
+.played-card .card-inner {
+  padding: 6px;
+}
+
+.played-card .card-value {
+  font-size: 1.2rem;
+}
+
+.played-card .card-suit {
+  font-size: 1rem;
+}
+
+.played-card .card-center-suit {
+  font-size: 2.2rem;
+}
+
+.deck-pile-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.15;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: var(--gold-accent);
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Controls panel (Bottom overlays)
+   ========================================================================== */
+
+.action-controls {
+  margin-top: 15px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-game {
+  padding: 10px 24px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.btn-game.play {
+  background: linear-gradient(135deg, var(--gold-accent) 0%, #bfa156 100%);
+  color: #0d1a13;
+  border: none;
+  box-shadow: 0 4px 12px rgba(213, 178, 99, 0.2);
+}
+
+.btn-game.play:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(213, 178, 99, 0.35);
+}
+
+.btn-game.play:disabled {
+  background: #333d37;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-game.pass {
+  background: rgba(201, 45, 57, 0.15);
+  color: #ff4a5a;
+  border: 1px solid rgba(201, 45, 57, 0.4);
+}
+
+.btn-game.pass:hover {
+  background: rgba(201, 45, 57, 0.25);
+}
+
+.btn-game.pass:disabled {
+  border-color: #333;
+  color: #666;
+  background: transparent;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Side logs / Action logs
+   ========================================================================== */
+
+.side-panel {
+  background: #09130e;
+  border-left: 1px solid rgba(213, 178, 99, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.side-header {
+  padding: 15px;
+  border-bottom: 1px solid rgba(213, 178, 99, 0.15);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--gold-accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-tag {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  background: var(--gold-light);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.logs-container {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-entry {
+  color: var(--text-secondary);
+  border-left: 2px solid rgba(255,255,255,0.05);
+  padding-left: 8px;
+  word-wrap: break-word;
+}
+
+.log-entry.play {
+  border-color: var(--gold-accent);
+  color: var(--text-primary);
+}
+
+.log-entry.system {
+  border-color: #52c49c;
+  font-style: italic;
+}
+
+.log-entry.pass {
+  border-color: #c92d39;
+  opacity: 0.8;
+}
+
+/* Custom Scrollbar for premium aesthetic */
+.logs-container::-webkit-scrollbar {
+  width: 6px;
+}
+.logs-container::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+}
+.logs-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+.logs-container::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-accent);
+}
+
+.trade-panel-trigger {
+  padding: 12px;
+  background: var(--gold-light);
+  border-top: 1px solid rgba(213, 178, 99, 0.15);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Trading Floor / Market overlay
+   ========================================================================== */
+
+.market-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 12, 8, 0.85);
+  backdrop-filter: blur(8px);
+  display: grid;
+  grid-template-columns: 1fr 340px; /* Market details left, user hand right */
+  z-index: 30;
+  animation: fadeIn 0.3s ease;
+}
+
+.market-trading-floor {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(213, 178, 99, 0.15);
+  overflow-y: auto;
+}
+
+.market-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  color: var(--gold-accent);
+  margin-bottom: 5px;
+}
+
+.market-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+}
+
+.close-market-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-market-btn:hover {
+  background: rgba(201, 45, 57, 0.15);
+  color: #ff4a5a;
+  border-color: rgba(201, 45, 57, 0.4);
+}
+
+.market-grids {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.market-offers-section {
+  flex: 1;
+}
+
+.market-section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold-accent);
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(213, 178, 99, 0.1);
+  padding-bottom: 8px;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.offer-card-row {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(213, 178, 99, 0.15);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.offerer-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.offer-cards-show {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mini-card-view {
+  width: 48px;
+  height: 70px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.mini-card-view .val {
+  font-size: 0.85rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+.mini-card-view .st {
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.market-arrow {
+  font-size: 1.2rem;
+  color: var(--gold-accent);
+}
+
+.bids-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 10px;
+}
+
+.bid-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.accept-bid-btn {
+  padding: 4px 10px;
+  background: #52c49c;
+  color: #061f12;
+  border: none;
+  font-weight: 700;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 0.2s;
+}
+
+.accept-bid-btn:hover {
+  background: #65d1ac;
+}
+
+/* Sidebar hand inside trading floor */
+.market-user-hand {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #09130e;
+}
+
+.hand-title-area {
+  margin-bottom: 15px;
+}
+
+.market-trades-count {
+  font-size: 0.85rem;
+  color: var(--gold-accent);
+  margin-top: 5px;
+}
+
+.market-hand-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.market-hand-scroll .card {
+  margin: 0;
+  width: 100%;
+  height: 120px;
+}
+
+.market-ready-area {
+  padding-top: 20px;
+  border-top: 1px solid rgba(213, 178, 99, 0.15);
+}
+
+/* ==========================================================================
+   Victory Screen Overlay
+   ========================================================================== */
+
+.victory-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.victory-card {
+  background: var(--panel-bg);
+  border: 2px solid var(--gold-accent);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(213, 178, 99, 0.2);
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.victory-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: inline-block;
+  animation: rotateGlow 2s infinite alternate;
+}
+
+.victory-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  color: var(--gold-accent);
+  margin-bottom: 10px;
+}
+
+.victory-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes bounce {
+  0% { transform: translate(-50%, -2px); }
+  100% { transform: translate(-50%, 4px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rotateGlow {
+  0% { filter: drop-shadow(0 0 5px rgba(213,178,99,0.3)); }
+  100% { filter: drop-shadow(0 0 20px rgba(213,178,99,0.8)); }
+}
+
+/* Error message popups */
+.error-popup {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c92d39;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 999;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideDown {
+  from { transform: translate(-50%, -100%); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .game-screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 180px; /* Logs at the bottom on smaller screen */
+  }
+
+  .side-panel {
+    border-left: none;
+    border-top: 1px solid rgba(213, 178, 99, 0.15);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --card-width: 70px;
+    --card-height: 102px;
+  }
+  
+  .card-value {
+    font-size: 1.1rem;
+  }
+  
+  .card-suit {
+    font-size: 0.9rem;
+  }
+  
+  .card-center-suit {
+    font-size: 2.2rem;
+  }
+
+  .seat.left {
+    left: 15px;
+  }
+  .seat.right {
+    right: 15px;
+  }
+}
+
+/* ==========================================================================
+   Integrated Trading Table Overlay
+   ========================================================================== */
+
+.center-felt.trading-mode {
+  top: 40%;
+  width: 560px;
+  height: 320px;
+  border-radius: 12px;
+  background: rgba(8, 22, 16, 0.45);
+  border: 1px dashed var(--gold-accent);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 15px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(213, 178, 99, 0.15);
+  z-index: 12;
+}
+
+.active-offers-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.table-trade-offer-card {
+  background: rgba(10, 22, 16, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  min-height: 110px;
+  text-align: left;
+}
+
+.table-trade-offer-card.my-offer {
+  border-color: var(--gold-accent);
+  background: rgba(213, 178, 99, 0.05);
+}
+
+.trade-offerer-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 4px;
+}
+
+.table-trade-offer-card.my-offer .trade-offerer-header {
+  color: var(--gold-accent);
+}
+
+.trade-core-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.trade-core-row .mini-card-view {
+  width: 36px;
+  height: 52px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 4px;
+  color: #000;
+  pointer-events: none;
+}
+
+.trade-core-row .mini-card-view.suit-hearts, .trade-core-row .mini-card-view.suit-diamonds {
+  color: var(--red-suit);
+}
+
+.trade-core-row .mini-card-view.suit-spades, .trade-core-row .mini-card-view.suit-clubs {
+  color: var(--black-suit);
+}
+
+.trade-core-row .mini-card-view .val {
+  font-size: 0.75rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.trade-core-row .mini-card-view .st {
+  font-size: 0.65rem;
+  text-align: right;
+  line-height: 1;
+}
+
+.trade-arrow {
+  font-size: 0.95rem;
+  color: var(--gold-accent);
+}
+
+.trade-wants-display {
+  flex: 1;
+  text-align: left;
+}
+
+.trade-wants-display .wants-lbl {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trade-wants-display .wants-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold-accent);
+  margin-top: 2px;
+}
+
+.trade-bids-container-box {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.bid-entry-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+.bid-entry-line .bidder-name-label {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+.bid-entry-line .bid-card-label {
+  font-weight: 600;
+  background: #fff;
+  color: #000;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+}
+
+.bid-entry-line .bid-card-label.suit-hearts, .bid-entry-line .bid-card-label.suit-diamonds {
+  color: var(--red-suit);
+}
+
+.bid-entry-line .bid-card-label.suit-spades, .bid-entry-line .bid-card-label.suit-clubs {
+  color: var(--black-suit);
+}
+
+.bid-entry-line-client {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  width: 100%;
+}
+
+.my-active-bid-indicator {
+  color: #52c49c;
+  font-weight: 500;
+}
+
+.my-active-bid-indicator span {
+  background: #fff;
+  color: #000;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.my-active-bid-indicator span.suit-hearts, .my-active-bid-indicator span.suit-diamonds {
+  color: var(--red-suit);
+}
+
+.my-active-bid-indicator span.suit-spades, .my-active-bid-indicator span.suit-clubs {
+  color: var(--black-suit);
+}
+
+.no-bids-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.bid-offer-btn {
+  padding: 3px 8px !important;
+  font-size: 0.7rem !important;
+  margin: 0 !important;
+}
+
+.trading-controls-panel-integrated {
+  background: rgba(10, 22, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 12px;
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.trading-controls-panel-integrated .trade-dropdowns {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.trading-controls-panel-integrated .trade-dropdowns .select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  width: 130px;
+}
+
+.trading-controls-panel-integrated .trade-dropdowns label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.trading-controls-panel-integrated .trade-dropdowns select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(213, 178, 99, 0.3);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  outline: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.trading-controls-panel-integrated .trade-dropdowns select:focus {
+  border-color: var(--gold-accent);
+  background: rgba(255,255,255,0.08);
+}
+
+.trading-controls-panel-integrated .trade-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.trading-controls-panel-integrated .trade-buttons .btn-game {
+  padding: 6px 16px;
+  font-size: 0.8rem;
+}
+
+.trading-controls-panel-integrated .trade-status-text {
+  font-size: 0.8rem;
+  color: var(--gold-accent);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Correct played cards overlap margins in center felt */
+.played-card {
+  margin-left: 0 !important;
+}
+
+/* Global mini-card color rules to prevent white-on-white text */
+.mini-card-view {
+  color: #000 !important;
+}
+.mini-card-view.suit-hearts, .mini-card-view.suit-diamonds {
+  color: var(--red-suit) !important;
+}
+.mini-card-view.suit-spades, .mini-card-view.suit-clubs {
+  color: var(--black-suit) !important;
+}
+
+/* Ensure select dropdown options are readable on all OS/browsers */
+.trading-controls-panel-integrated .trade-dropdowns select option {
+  background: #0b1a13;
+  color: var(--text-primary);
+}
+
+/* Trade inspector panel inside center felt */
+.trade-inspector-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.trade-inspector-panel .inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.trade-inspector-panel .inspector-core {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.trade-inspector-panel .trade-wants-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trade-inspector-panel .trade-wants-display .wants-lbl {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.trade-inspector-panel .trade-wants-display .wants-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-accent);
+  margin-top: 2px;
+}
+
+/* Scrollable listing of active trade offers in center felt */
+.table-trade-offers-scroll-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 8px 4px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.table-trade-offers-scroll-row::-webkit-scrollbar {
+  height: 5px;
+}
+.table-trade-offers-scroll-row::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+.table-trade-offers-scroll-row::-webkit-scrollbar-thumb {
+  background: rgba(213,178,99,0.3);
+  border-radius: 3px;
+}
+.table-trade-offers-scroll-row::-webkit-scrollbar-thumb:hover {
+  background: rgba(213,178,99,0.5);
+}
+
+.mini-trade-card-btn {
+  background: rgba(10, 22, 16, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.mini-trade-card-btn:hover {
+  background: rgba(213, 178, 99, 0.15);
+  border-color: var(--gold-accent);
+  transform: translateY(-2px);
+}
+
+.mini-trade-card-btn.my-offer {
+  border-color: var(--gold-accent);
+  background: rgba(213, 178, 99, 0.05);
+}
+
+.mini-trade-card-btn .lbl {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-trade-card-btn .bids-badge {
+  font-size: 0.6rem;
+  background: rgba(213, 178, 99, 0.2);
+  color: var(--gold-accent);
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* Player seat panel trade preview tags */
+.player-panel-trade-preview {
+  margin-top: 6px;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  padding: 3px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+  z-index: 15;
+}
+
+.player-panel-trade-preview.suit-hearts, .player-panel-trade-preview.suit-diamonds {
+  color: var(--red-suit) !important;
+}
+.player-panel-trade-preview.suit-spades, .player-panel-trade-preview.suit-clubs {
+  color: var(--black-suit) !important;
+}
+
+.player-panel-trade-preview:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 8px rgba(213, 178, 99, 0.4);
+}
+
+.player-panel-trade-preview.selected {
+  border: 1.5px solid var(--gold-accent);
+  box-shadow: 0 0 10px rgba(213, 178, 99, 0.6);
+}
+
+.player-panel-trade-preview .preview-title {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  color: #555;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.player-panel-trade-preview .preview-card-display {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Dev Sandbox Bar Styling */
+.dev-sandbox-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(10, 25, 20, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--gold-accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-sans);
+}
+
+.dev-sandbox-bar .bar-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: var(--gold-accent);
+  text-shadow: 0 0 10px rgba(213, 178, 99, 0.4);
+}
+
+.dev-sandbox-bar .bar-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.dev-sandbox-bar .dev-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dev-sandbox-bar .dev-btn:hover {
+  background: rgba(213, 178, 99, 0.15);
+  border-color: var(--gold-accent);
+  color: var(--text-primary);
+}
+
+.dev-sandbox-bar .dev-btn.active {
+  background: var(--gold-accent);
+  border-color: var(--gold-accent);
+  color: #0b1a13;
+  box-shadow: 0 0 10px rgba(213, 178, 99, 0.5);
+}
+
+.dev-sandbox-bar .dev-btn.exit-btn {
+  border-color: #c92d39;
+  color: #c92d39;
+  background: rgba(201, 45, 57, 0.05);
+}
+
+.dev-sandbox-bar .dev-btn.exit-btn:hover {
+  background: #c92d39;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(201, 45, 57, 0.5);
+}
+
+body:has(.dev-sandbox-bar) #app {
+  padding-top: 50px;
+}
+

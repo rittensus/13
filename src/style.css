@@ -1863,13 +1863,219 @@ body:has(.dev-sandbox-bar) #app {
   line-height: 1;
 }
 
-.wants-grid-card.suit-red {
-  color: #ff4a5a;
-  border-color: rgba(255, 74, 90, 0.12);
-}
-
 .wants-grid-card.suit-black {
   color: #c4d1e6;
   border-color: rgba(196, 209, 230, 0.12);
+}
+
+/* Touch and tap highlights optimization */
+button, .card, .mini-trade-card-btn, .wants-grid-card, .wants-quick-btn, .close-x, .btn-game {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Force standard text input size on Safari to prevent viewport zooming */
+input[type="text"] {
+  font-size: 16px !important;
+}
+
+/* Table Header Bar for Mobile */
+.table-header-bar {
+  display: none; /* Hidden on Desktop */
+}
+
+/* Sidebar Drawer Backdrop */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1500;
+  display: none;
+}
+
+/* Mobile & Tablet Layout Adjustments */
+@media (max-width: 1023px) {
+  body {
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    background: #000;
+  }
+
+  .game-screen {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr !important;
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+
+  .table-header-bar {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .mobile-room-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold-accent);
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+
+  /* Slide-out Logs Drawer Panel */
+  .side-panel {
+    position: fixed !important;
+    top: 0;
+    right: -300px !important; /* Hide offscreen */
+    width: 280px !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    z-index: 1600 !important;
+    background: rgba(18, 18, 24, 0.95) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-left: 1px solid rgba(213, 178, 99, 0.2) !important;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6) !important;
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-top: none !important;
+  }
+
+  .side-panel.drawer-active {
+    right: 0 !important;
+  }
+
+  /* Table Scale down for phones */
+  .center-felt {
+    width: 240px !important;
+    height: 160px !important;
+  }
+
+  .center-felt.trading-mode {
+    width: 90% !important;
+    max-width: 340px !important;
+    height: 340px !important;
+    top: 38% !important;
+    padding: 10px !important;
+  }
+
+  .active-offers-table-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Shrink cards inside hand and played stack */
+  :root {
+    --card-width: 60px;
+    --card-height: 88px;
+  }
+
+  .played-card, .played-card-static, .played-card-history {
+    width: 60px !important;
+    height: 88px !important;
+  }
+
+  /* Position Played cards offset scale for mobile */
+  @keyframes playCardAnim {
+    0% {
+      opacity: 0;
+      transform: translate(var(--play-origin-x, 0px), var(--play-origin-y, 180px)) scale(1.2) rotate(0deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(var(--play-offset-x, 0px), var(--play-offset-y, 0px)) rotate(var(--play-angle, 0deg)) scale(1);
+    }
+  }
+
+  /* Reposition player seats to fit portrait orientation on phones */
+  .seat.bottom {
+    bottom: 25px !important;
+    width: 95% !important;
+  }
+
+  .seat.top {
+    top: 50px !important;
+  }
+
+  .seat.left {
+    left: 12px !important;
+    top: 32% !important;
+    transform: translateY(-50%) scale(0.85) !important;
+  }
+
+  .seat.right {
+    right: 12px !important;
+    top: 32% !important;
+    transform: translateY(-50%) scale(0.85) !important;
+  }
+
+  /* Player Panel mobile padding */
+  .player-panel {
+    padding: 6px 10px !important;
+  }
+
+  .player-name {
+    font-size: 0.8rem !important;
+  }
+
+  .cards-left-badge {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+  }
+
+  /* Deck pile sizing adjustments */
+  .deck-pile-center {
+    font-size: 0.85rem !important;
+  }
+
+  /* Wants selection grid size adjustment on phone */
+  .wants-modal-card {
+    padding: 14px !important;
+    max-height: 90vh !important;
+  }
+
+  .specific-cards-scroll-grid {
+    max-height: 180px !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ultra-small phones */
+  :root {
+    --card-width: 52px;
+    --card-height: 76px;
+  }
+
+  .played-card, .played-card-static, .played-card-history {
+    width: 52px !important;
+    height: 76px !important;
+  }
+
+  .seat.left {
+    left: 4px !important;
+    top: 30% !important;
+  }
+
+  .seat.right {
+    right: 4px !important;
+    top: 30% !important;
+  }
+
+  .cards-container {
+    gap: -24px !important; /* overlap more on small screens */
+  }
+
+  .table-outer-wood {
+    border-width: 10px !important;
+  }
 }
 

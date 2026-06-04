@@ -355,8 +355,18 @@ export function renderGameScreen(
   // Clear existing UI structure first
   app.innerHTML = `
     <div class="game-screen">
+      <!-- Sidebar Drawer Backdrop -->
+      <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
       <div class="table-area">
         <div class="table-outer-wood"></div>
+        
+        <!-- Mobile Header Bar -->
+        <div class="table-header-bar">
+          <span class="mobile-room-tag">Room: ${room.roomCode}</span>
+          <button id="mobile-drawer-toggle" class="btn-game play">Logs ☰</button>
+        </div>
+
         <div class="center-felt ${room.status === 'TRADING' ? 'trading-mode' : ''}">
           <div class="discard-pile" id="discard-pile-container">
             <span class="deck-pile-center">Tiến Lên</span>
@@ -383,6 +393,23 @@ export function renderGameScreen(
       </div>
     </div>
   `;
+
+  // Mobile Drawer Toggle handlers
+  const drawerToggle = document.getElementById('mobile-drawer-toggle');
+  const sidePanel = document.querySelector('.side-panel');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
+
+  if (drawerToggle && sidePanel && drawerBackdrop) {
+    drawerToggle.addEventListener('click', () => {
+      sidePanel.classList.add('drawer-active');
+      (drawerBackdrop as HTMLElement).style.display = 'block';
+    });
+
+    drawerBackdrop.addEventListener('click', () => {
+      sidePanel.classList.remove('drawer-active');
+      (drawerBackdrop as HTMLElement).style.display = 'none';
+    });
+  }
 
   // Render Dev Mode bar if enabled
   if (isDevMode) {

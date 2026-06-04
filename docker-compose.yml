@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   game:
-    image: ghcr.io/classic-tienlen:latest
+    image: ghcr.io/rittensus/13:latest
     build:
       context: .
       dockerfile: Dockerfile

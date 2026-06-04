@@ -9,13 +9,16 @@ import {
   setReRenderCallback
 } from './ui.js';
 import {
-  playCardTap,
   playCardSlide,
   playClick,
   playChime,
   playBuzz,
   resumeAudio,
-  playVictoryFanfare
+  playVictoryFanfare,
+  playCardSwoosh,
+  playCardSnap,
+  playComboPlay,
+  playBombPlay
 } from './audio.js';
 
 const app = document.getElementById('app')!;
@@ -85,7 +88,9 @@ function renderCurrentView() {
       handleAcceptBid,
       handleReadyToPlay,
       handleSkipTrading,
-      handleRestartGame
+      handleRestartGame,
+      handleCancelTradeOffer,
+      handleCancelBid
     );
   }
 }
@@ -102,7 +107,15 @@ function triggerSoundCues(room: GameRoom) {
   // 2. Play Turn (card played) & Turn notification
   if (room.status === 'PLAYING') {
     if (room.lastPlay.length > 0 && room.lastPlay.length !== previousLastPlayLength) {
-      playCardTap();
+      playCardSwoosh();
+      const count = room.lastPlay.length;
+      if (count === 1) {
+        setTimeout(() => playCardSnap(), 150);
+      } else if (count >= 4) {
+        setTimeout(() => playBombPlay(), 150);
+      } else {
+        setTimeout(() => playComboPlay(count), 150);
+      }
     }
     
     // Play notification chime when it becomes your turn
@@ -213,6 +226,16 @@ function handleReadyToPlay() {
 function handleRestartGame() {
   playClick();
   socket.emit('restartGame');
+}
+
+function handleCancelTradeOffer() {
+  playClick();
+  socket.emit('cancelTradeOffer');
+}
+
+function handleCancelBid(offerId: string) {
+  playClick();
+  socket.emit('cancelBid', { offerId });
 }
 
 // Initialize View

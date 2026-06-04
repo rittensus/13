@@ -415,6 +415,46 @@ io.on('connection', (socket: Socket) => {
     io.to(roomCode).emit('roomState', room, activeTradeOffers[roomCode]);
   });
 
+  // Cancel Trade Offer (Listing)
+  socket.on('cancelTradeOffer', () => {
+    const roomCode = socketToRoom[socket.id];
+    const room = rooms[roomCode];
+    if (!room || room.status !== 'TRADING') return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    const offers = activeTradeOffers[roomCode];
+    const existingIndex = offers.findIndex(o => o.offererId === socket.id);
+    if (existingIndex !== -1) {
+      const offer = offers[existingIndex];
+      offers.splice(existingIndex, 1);
+      room.combatLogs.push(`${player.name} withdrew their trade offer for ${getCardName(offer.offererCard)}.`);
+      io.to(roomCode).emit('roomState', room, offers);
+    }
+  });
+
+  // Cancel Bid
+  socket.on('cancelBid', ({ offerId }: { offerId: string }) => {
+    const roomCode = socketToRoom[socket.id];
+    const room = rooms[roomCode];
+    if (!room || room.status !== 'TRADING') return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    const offers = activeTradeOffers[roomCode];
+    const offer = offers.find(o => o.id === offerId);
+    if (offer) {
+      const bidIndex = offer.bids.findIndex(b => b.bidderId === socket.id);
+      if (bidIndex !== -1) {
+        offer.bids.splice(bidIndex, 1);
+        room.combatLogs.push(`${player.name} withdrew their bid on ${room.players.find(p => p.id === offer.offererId)?.name || 'AI'}'s offer.`);
+        io.to(roomCode).emit('roomState', room, offers);
+      }
+    }
+  });
+
   // Accept Bid
   socket.on('acceptBid', ({ offerId, bidderId }: { offerId: string; bidderId: string }) => {
     const roomCode = socketToRoom[socket.id];

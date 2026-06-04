@@ -62,6 +62,7 @@ function attach3DTilt(cardEl: HTMLElement) {
 let selectedOfferId: string | null = null;
 let isDevMode = false;
 let onReRenderCallback: (() => void) | null = null;
+let selectedWants: { rank: number | null; suit: Suit | null } = { rank: null, suit: null };
 
 export function setReRenderCallback(cb: () => void) {
   onReRenderCallback = cb;
@@ -163,6 +164,126 @@ function createCardElement(card: Card, isPlayable: boolean = true): HTMLElement 
   return cardEl;
 }
 
+function getWantsDescription(wants: { rank: number | null; suit: Suit | null }): string {
+  if (wants.rank === null && wants.suit === null) return 'Any Card';
+  const rankLabels: Record<number, string> = {
+    3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10',
+    11: 'J', 12: 'Q', 13: 'K', 14: 'A', 15: '2'
+  };
+  const suitSymbols: Record<string, string> = {
+    spades: '♠', clubs: '♣', diamonds: '♦', hearts: '♥'
+  };
+  const rName = wants.rank ? (rankLabels[wants.rank] || String(wants.rank)) : 'Any';
+  const sSym = wants.suit ? (suitSymbols[wants.suit] || wants.suit) : 'Any';
+
+  if (wants.rank !== null && wants.suit !== null) return `${rName}${sSym}`;
+  if (wants.rank !== null) return `Any ${rName}`;
+  return `Any ${sSym}`;
+}
+
+export function showWantsSelectorModal(
+  onSelect: (wants: { rank: number | null; suit: Suit | null }) => void
+) {
+  const existing = document.querySelector('.wants-modal-overlay');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'wants-modal-overlay';
+  
+  const ranks = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  const suits: Suit[] = ['spades', 'clubs', 'diamonds', 'hearts'];
+  const suitSymbols: Record<Suit, string> = { spades: '♠', clubs: '♣', diamonds: '♦', hearts: '♥' };
+  const rankLabels: Record<number, string> = {
+    3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10',
+    11: 'J', 12: 'Q', 13: 'K', 14: 'A', 15: '2'
+  };
+
+  const rankSelectorsHtml = ranks.map(r => `
+    <button class="wants-quick-btn rank-btn" data-rank="${r}">Any ${rankLabels[r]}</button>
+  `).join('');
+
+  const suitSelectorsHtml = suits.map(s => `
+    <button class="wants-quick-btn suit-btn suit-${s}" data-suit="${s}">Any ${suitSymbols[s]}</button>
+  `).join('');
+
+  let cardsGridHtml = '';
+  ranks.forEach(r => {
+    suits.forEach(s => {
+      const isRed = s === 'hearts' || s === 'diamonds';
+      cardsGridHtml += `
+        <div class="wants-grid-card ${isRed ? 'suit-red' : 'suit-black'}" data-rank="${r}" data-suit="${s}">
+          <span class="val">${rankLabels[r]}</span>
+          <span class="st">${suitSymbols[s]}</span>
+        </div>
+      `;
+    });
+  });
+
+  modal.innerHTML = `
+    <div class="wants-modal-card">
+      <div class="modal-header">
+        <h3>Select Card You Want</h3>
+        <button id="close-wants-modal-btn" class="close-x">×</button>
+      </div>
+      
+      <div class="modal-section">
+        <button class="wants-quick-btn any-card-btn" data-any="true" style="width:100%; font-weight:700; border-color:var(--gold-accent); color:var(--gold-accent); background:rgba(213,178,99,0.05);">★ Any Card</button>
+      </div>
+
+      <div class="modal-section">
+        <div class="section-title">Quick Suit Shortcuts</div>
+        <div class="quick-suits-grid">
+          ${suitSelectorsHtml}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="section-title">Quick Rank Shortcuts</div>
+        <div class="quick-ranks-grid">
+          ${rankSelectorsHtml}
+        </div>
+      </div>
+
+      <div class="modal-section" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+        <div class="section-title">Select Specific Card</div>
+        <div class="specific-cards-scroll-grid">
+          ${cardsGridHtml}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  document.getElementById('close-wants-modal-btn')?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  modal.querySelectorAll('.wants-quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.getAttribute('data-any')) {
+        onSelect({ rank: null, suit: null });
+      } else if (btn.getAttribute('data-suit')) {
+        onSelect({ rank: null, suit: btn.getAttribute('data-suit') as Suit });
+      } else if (btn.getAttribute('data-rank')) {
+        onSelect({ rank: parseInt(btn.getAttribute('data-rank')!), suit: null });
+      }
+      closeModal();
+    });
+  });
+
+  modal.querySelectorAll('.wants-grid-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const rank = parseInt(card.getAttribute('data-rank')!);
+      const suit = card.getAttribute('data-suit') as Suit;
+      onSelect({ rank, suit });
+      closeModal();
+    });
+  });
+}
+
 // 3. Render Game Screen (Table + Sidebar)
 export function renderGameScreen(
   app: HTMLElement,
@@ -176,7 +297,9 @@ export function renderGameScreen(
   onAcceptBid: (offerId: string, bidderId: string) => void,
   onReadyToPlay: () => void,
   onSkipTrading: () => void,
-  onRestartGame: () => void
+  onRestartGame: () => void,
+  onCancelTradeOffer: () => void,
+  onCancelBid: (offerId: string) => void
 ) {
   // Validate selected offer still exists
   if (selectedOfferId && !activeTradeOffers.some(o => o.id === selectedOfferId)) {
@@ -222,6 +345,9 @@ export function renderGameScreen(
           <span class="room-tag">Room: ${room.roomCode}</span>
         </div>
         <div class="logs-container" id="logs-container"></div>
+        <div class="sidebar-footer" style="padding: 4px 10px; font-size: 0.65rem; color: var(--text-secondary); text-align: right; opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.05); font-family: var(--font-sans);">
+          v1.3.0
+        </div>
       </div>
     </div>
   `;
@@ -348,17 +474,24 @@ export function renderGameScreen(
         const myBid = offer.bids.find(b => b.bidderId === socketId);
         const otherBidsCount = offer.bids.filter(b => b.bidderId !== socketId).length;
         bidsHtml = `
-          <div class="bid-entry-line-client">
+          <div class="bid-entry-line-client" style="text-align: center; width: 100%;">
             ${myBid ? `
-              <div class="my-active-bid-indicator" style="font-size:0.8rem;">
+              <div class="my-active-bid-indicator" style="font-size:0.8rem; margin-bottom: 6px;">
                 Your bid: <span class="${getSuitDetails(myBid.bidderCard.suit).className}">${myBid.bidderCard.name}${getSuitDetails(myBid.bidderCard.suit).symbol}</span>
               </div>
             ` : `
-              <span class="no-bids-text">${otherBidsCount} other bids placed</span>
+              <span class="no-bids-text" style="display:block; margin-bottom:6px; font-size:0.75rem;">${otherBidsCount} other bids placed</span>
             `}
-            <button class="btn-game play bid-offer-btn" data-offer-id="${offer.id}" ${me && me.tradesRemaining > 0 ? '' : 'disabled'}>
-              ${myBid ? 'Change Bid' : 'Bid Selected'}
-            </button>
+            <div style="display:flex; gap:8px; justify-content:center; width:100%;">
+              <button class="btn-game play bid-offer-btn" data-offer-id="${offer.id}" ${me && me.tradesRemaining > 0 ? '' : 'disabled'} style="padding: 4px 10px; font-size: 0.75rem; margin:0;">
+                ${myBid ? 'Change Bid' : 'Bid Selected'}
+              </button>
+              ${myBid ? `
+                <button class="btn-game pass cancel-bid-btn" data-offer-id="${offer.id}" style="border-color:#ff4a5a; color:#ff4a5a; background:rgba(255,74,90,0.05); padding: 4px 10px; font-size: 0.75rem; margin:0;">
+                  Cancel Bid
+                </button>
+              ` : ''}
+            </div>
           </div>
         `;
       }
@@ -414,6 +547,12 @@ export function renderGameScreen(
         const cardId = selected.getAttribute('data-id')!;
         onSubmitBid(offerId, cardId);
       });
+
+      // Bind Cancel Bid button
+      discardEl.querySelector('.cancel-bid-btn')?.addEventListener('click', (e) => {
+        const offerId = (e.target as HTMLElement).getAttribute('data-offer-id')!;
+        onCancelBid(offerId);
+      });
     }
   } else if (room.lastPlay.length > 0) {
     discardEl.innerHTML = '';
@@ -450,6 +589,7 @@ export function renderGameScreen(
       cardEl.style.setProperty('--play-offset-x', `${offsetX}px`);
       cardEl.style.setProperty('--play-offset-y', `${offsetY}px`);
       cardEl.style.setProperty('--play-angle', `${angle}deg`);
+      cardEl.style.animationDelay = `${index * 80}ms`;
 
       // Fallback direct styling
       cardEl.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${angle}deg)`;
@@ -540,81 +680,98 @@ export function renderGameScreen(
       bottomSeatEl.appendChild(cardsContainer);
 
       // Create Trading Controls Panel
+      let updateTradeControlsState = () => {};
       const isHost = room.players.length > 0 && room.players[0].id === socketId;
+      const myOffer = activeTradeOffers.find(o => o.offererId === socketId);
       const tradeControls = document.createElement('div');
       tradeControls.className = 'trading-controls-panel-integrated';
-      tradeControls.innerHTML = `
-        <div class="trade-dropdowns">
-          <div class="select-wrapper">
-            <label for="trade-wants-rank">Wants Rank</label>
-            <select id="trade-wants-rank">
-              <option value="">Any Rank</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">J</option>
-              <option value="12">Q</option>
-              <option value="13">K</option>
-              <option value="14">A</option>
-              <option value="15">2</option>
-            </select>
-          </div>
-          <div class="select-wrapper">
-            <label for="trade-wants-suit">Wants Suit</label>
-            <select id="trade-wants-suit">
-              <option value="">Any Suit</option>
-              <option value="spades">♠ Spades</option>
-              <option value="clubs">♣ Clubs</option>
-              <option value="diamonds">♦ Diamonds</option>
-              <option value="hearts">♥ Hearts</option>
-            </select>
-          </div>
-        </div>
-        <div class="trade-buttons">
-          <button id="list-trade-btn" class="btn-game play" disabled>List Card for Trade</button>
-          <button id="ready-trade-btn" class="btn-game pass" ${pBottom.isReady ? 'disabled' : ''}>
-            ${pBottom.isReady ? 'Ready ✓' : 'Ready to Play'}
-          </button>
-          ${isHost ? `<button id="skip-trade-btn" class="btn-game pass" style="border-color:#fa9632; color:#fa9632; background:rgba(250,150,50,0.05);">Skip Trading</button>` : ''}
-        </div>
-        <div class="trade-status-text">
-          Remaining Trades: ${pBottom.tradesRemaining} ${pBottom.isReady ? '(Ready)' : ''}
-        </div>
-      `;
-      bottomSeatEl.insertBefore(tradeControls, cardsContainer);
 
-      const listBtn = document.getElementById('list-trade-btn') as HTMLButtonElement;
-      const readyBtn = document.getElementById('ready-trade-btn') as HTMLButtonElement;
-      const skipBtn = document.getElementById('skip-trade-btn') as HTMLButtonElement;
-      const selectRank = document.getElementById('trade-wants-rank') as HTMLSelectElement;
-      const selectSuit = document.getElementById('trade-wants-suit') as HTMLSelectElement;
+      if (myOffer) {
+        tradeControls.innerHTML = `
+          <div class="trade-dropdowns">
+            <div style="font-size:0.85rem; padding: 10px; border-radius: 6px; background: rgba(213,178,99,0.08); border: 1px solid rgba(213,178,99,0.2); text-align: center; width: 100%;">
+              You offered <span class="${getSuitDetails(myOffer.offererCard.suit).className}" style="font-weight:700;">${myOffer.offererCard.name}${getSuitDetails(myOffer.offererCard.suit).symbol}</span>
+              for <span style="font-weight:700; color: var(--gold-accent);">${getWantsDescription(myOffer.lookingFor)}</span>
+            </div>
+          </div>
+          <div class="trade-buttons">
+            <button id="withdraw-offer-btn" class="btn-game pass" style="border-color:#ff4a5a; color:#ff4a5a; background:rgba(255,74,90,0.05); margin: 0; padding: 10px 14px;">Withdraw Listing</button>
+            <button id="ready-trade-btn" class="btn-game play" ${pBottom.isReady ? 'disabled' : ''}>
+              ${pBottom.isReady ? 'Ready ✓' : 'Ready to Play'}
+            </button>
+            ${isHost ? `<button id="skip-trade-btn" class="btn-game pass" style="border-color:#fa9632; color:#fa9632; background:rgba(250,150,50,0.05);">Skip Trading</button>` : ''}
+          </div>
+          <div class="trade-status-text">
+            Remaining Trades: ${pBottom.tradesRemaining} ${pBottom.isReady ? '(Ready)' : ''}
+          </div>
+        `;
+        bottomSeatEl.insertBefore(tradeControls, cardsContainer);
 
-      const updateTradeControlsState = () => {
-        const selected = cardsContainer.querySelector('.card.selected');
-        if (selected && pBottom.tradesRemaining > 0) {
-          listBtn.disabled = false;
-        } else {
-          listBtn.disabled = true;
+        const withdrawBtn = document.getElementById('withdraw-offer-btn') as HTMLButtonElement;
+        const readyBtn = document.getElementById('ready-trade-btn') as HTMLButtonElement;
+        const skipBtn = document.getElementById('skip-trade-btn') as HTMLButtonElement;
+
+        withdrawBtn.addEventListener('click', () => {
+          onCancelTradeOffer();
+        });
+        readyBtn.addEventListener('click', onReadyToPlay);
+        if (skipBtn) {
+          skipBtn.addEventListener('click', onSkipTrading);
         }
-      };
+      } else {
+        tradeControls.innerHTML = `
+          <div class="trade-dropdowns">
+            <button id="select-wants-trigger-btn" class="btn-game play" style="width: 100%; margin: 0; padding: 10px 14px; font-size: 0.85rem; justify-content: center; display: flex; align-items: center; gap: 8px;">
+              <span>🔍 Want:</span> <span style="font-weight: 700; color: var(--gold-accent);">${getWantsDescription(selectedWants)}</span>
+            </button>
+          </div>
+          <div class="trade-buttons">
+            <button id="list-trade-btn" class="btn-game play" disabled>List Card for Trade</button>
+            <button id="ready-trade-btn" class="btn-game pass" ${pBottom.isReady ? 'disabled' : ''}>
+              ${pBottom.isReady ? 'Ready ✓' : 'Ready to Play'}
+            </button>
+            ${isHost ? `<button id="skip-trade-btn" class="btn-game pass" style="border-color:#fa9632; color:#fa9632; background:rgba(250,150,50,0.05);">Skip Trading</button>` : ''}
+          </div>
+          <div class="trade-status-text">
+            Remaining Trades: ${pBottom.tradesRemaining} ${pBottom.isReady ? '(Ready)' : ''}
+          </div>
+        `;
+        bottomSeatEl.insertBefore(tradeControls, cardsContainer);
 
-      listBtn.addEventListener('click', () => {
-        const selected = cardsContainer.querySelector('.card.selected');
-        if (!selected) return;
-        const cardId = selected.getAttribute('data-id')!;
-        const wantsRank = selectRank.value ? parseInt(selectRank.value) : null;
-        const wantsSuit = selectSuit.value ? selectSuit.value as Suit : null;
-        onSubmitTradeOffer(cardId, { rank: wantsRank, suit: wantsSuit });
-      });
+        const selectWantsBtn = document.getElementById('select-wants-trigger-btn') as HTMLButtonElement;
+        const listBtn = document.getElementById('list-trade-btn') as HTMLButtonElement;
+        const readyBtn = document.getElementById('ready-trade-btn') as HTMLButtonElement;
+        const skipBtn = document.getElementById('skip-trade-btn') as HTMLButtonElement;
 
-      readyBtn.addEventListener('click', onReadyToPlay);
-      if (skipBtn) {
-        skipBtn.addEventListener('click', onSkipTrading);
+        updateTradeControlsState = () => {
+          const selected = cardsContainer.querySelector('.card.selected');
+          if (selected && pBottom.tradesRemaining > 0) {
+            listBtn.disabled = false;
+          } else {
+            listBtn.disabled = true;
+          }
+        };
+
+        selectWantsBtn.addEventListener('click', () => {
+          showWantsSelectorModal((wants) => {
+            selectedWants = wants;
+            playCardSelect();
+            if (onReRenderCallback) onReRenderCallback();
+          });
+        });
+
+        listBtn.addEventListener('click', () => {
+          const selected = cardsContainer.querySelector('.card.selected');
+          if (!selected) return;
+          const cardId = selected.getAttribute('data-id')!;
+          onSubmitTradeOffer(cardId, selectedWants);
+          selectedWants = { rank: null, suit: null };
+        });
+
+        readyBtn.addEventListener('click', onReadyToPlay);
+        if (skipBtn) {
+          skipBtn.addEventListener('click', onSkipTrading);
+        }
       }
 
     } else if (room.status === 'PLAYING') {
@@ -700,16 +857,19 @@ export function renderGameScreen(
   }
 }
 
-// 4. Update renderWelcomeScreen to include Sandbox start button
+// 4. Update renderWelcomeScreen to include Sandbox start button (dev only) and version
 export function renderWelcomeScreen(
   app: HTMLElement,
   onCreate: (name: string) => void,
   onJoin: (name: string, code: string) => void
 ) {
+  const showDevSandbox = import.meta.env.DEV;
+
   app.innerHTML = `
     <div class="welcome-screen">
       <div class="welcome-card">
         <h1>Tiến Lên Classic</h1>
+        <div style="font-size:0.75rem; color:var(--text-secondary); text-align:center; margin-top:-10px; margin-bottom:20px; opacity:0.6;">v1.3.0</div>
         <div class="input-group">
           <label for="player-name">Your Display Name</label>
           <input type="text" id="player-name" placeholder="Enter name..." value="Netrunner">
@@ -721,8 +881,10 @@ export function renderWelcomeScreen(
           <input type="text" id="room-code" placeholder="4-Letter Code" style="text-align: center; text-transform: uppercase;">
         </div>
         <button id="join-room-btn" class="btn-secondary">Join Game</button>
-        <div class="divider" style="margin-top:25px;">Testing Sandbox</div>
-        <button id="dev-sandbox-btn" class="btn-secondary" style="border-color:var(--gold-accent); color:var(--gold-accent); background:rgba(213,178,99,0.05);">Start Dev Sandbox</button>
+        ${showDevSandbox ? `
+          <div class="divider" style="margin-top:25px;">Testing Sandbox</div>
+          <button id="dev-sandbox-btn" class="btn-secondary" style="border-color:var(--gold-accent); color:var(--gold-accent); background:rgba(213,178,99,0.05);">Start Dev Sandbox</button>
+        ` : ''}
       </div>
     </div>
   `;
@@ -767,28 +929,32 @@ export function renderWelcomeScreen(
     onJoin(name, code);
   });
 
-  // Start Sandbox
-  document.getElementById('dev-sandbox-btn')?.addEventListener('click', () => {
-    isDevMode = true;
-    renderDevSandboxBar(app, 'welcome');
-    // Load lobby mock state
-    const { room, offers } = getMockRoom('lobby');
-    renderGameScreen(
-      app,
-      room,
-      'dev_player',
-      offers,
-      () => {},
-      () => {},
-      () => {},
-      () => {},
-      () => {},
-      () => {},
-      () => {},
-      () => {}
-    );
-    renderDevSandboxBar(app, 'lobby');
-  });
+  // Start Sandbox (dev only)
+  if (showDevSandbox) {
+    document.getElementById('dev-sandbox-btn')?.addEventListener('click', () => {
+      isDevMode = true;
+      renderDevSandboxBar(app, 'welcome');
+      // Load lobby mock state
+      const { room, offers } = getMockRoom('lobby');
+      renderGameScreen(
+        app,
+        room,
+        'dev_player',
+        offers,
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        () => {}
+      );
+      renderDevSandboxBar(app, 'lobby');
+    });
+  }
 }
 
 function mockCard(rank: number, suit: Suit): Card {
@@ -962,7 +1128,7 @@ export function renderDevSandboxBar(app: HTMLElement, currentMode: string) {
               const [rank, suit] = id.split('_');
               return mockCard(parseInt(rank), suit as Suit);
             });
-            renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
+            renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
             renderDevSandboxBar(app, mode);
           },
           () => showError('[Dev Mode] Passed Turn'),
@@ -978,7 +1144,7 @@ export function renderDevSandboxBar(app: HTMLElement, currentMode: string) {
                 bids: []
               });
               room.players[0].cards = room.players[0].cards.filter(c => c.id !== cardId);
-              renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
+              renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
               renderDevSandboxBar(app, mode);
             }
           },
@@ -991,7 +1157,7 @@ export function renderDevSandboxBar(app: HTMLElement, currentMode: string) {
           () => {
             showError('[Dev Mode] Ready status clicked');
             room.players[0].isReady = !room.players[0].isReady;
-            renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
+            renderGameScreen(app, room, 'dev_player', offers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
             renderDevSandboxBar(app, mode);
           },
           () => {
@@ -1000,8 +1166,14 @@ export function renderDevSandboxBar(app: HTMLElement, currentMode: string) {
           () => {
             showError('[Dev Mode] Restarting game (back to lobby)');
             const { room: lobbyRoom, offers: lobbyOffers } = getMockRoom('lobby');
-            renderGameScreen(app, lobbyRoom, 'dev_player', lobbyOffers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
+            renderGameScreen(app, lobbyRoom, 'dev_player', lobbyOffers, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {}, () => {});
             renderDevSandboxBar(app, 'lobby');
+          },
+          () => {
+            showError('[Dev Mode] Cancel Trade Offer clicked');
+          },
+          (offerId) => {
+            showError(`[Dev Mode] Cancel Bid clicked for offer ${offerId}`);
           }
         );
         renderDevSandboxBar(app, mode);

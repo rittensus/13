@@ -214,3 +214,159 @@ export function playVictoryFanfare() {
   playNote(783.99, 0.48, 0.7);   // G5
   playNote(1046.50, 0.60, 1.2, 0.12); // C6
 }
+
+// 9. Card played swoosh sound
+export function playCardSwoosh() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const bufferSize = ctx.sampleRate * 0.18; // 0.18s swoosh
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(600, ctx.currentTime);
+  filter.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.18);
+  filter.Q.setValueAtTime(1.5, ctx.currentTime);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start();
+  noise.stop(ctx.currentTime + 0.18);
+}
+
+// 10. Card snap landing sound
+export function playCardSnap() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  // Short high-frequency sine click combined with decaying low frequency triangle thump
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1000, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.05);
+
+  gain.gain.setValueAtTime(0.2, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.05);
+
+  // Add low-freq component
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  osc2.type = 'triangle';
+  osc2.frequency.setValueAtTime(150, ctx.currentTime);
+  osc2.frequency.linearRampToValueAtTime(60, ctx.currentTime + 0.08);
+
+  gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+
+  osc2.start();
+  osc2.stop(ctx.currentTime + 0.08);
+}
+
+// 11. Staggered multiple card combo plays
+export function playComboPlay(count: number) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  // Play count snaps with 60ms stagger
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      playCardSnap();
+    }, i * 60);
+  }
+}
+
+// 12. Bomb play impact
+export function playBombPlay() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+
+  // Heavy low-frequency thump
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(90, now);
+  osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+  gain.gain.setValueAtTime(0.35, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(180, now);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(now + 0.35);
+
+  // High-frequency explosion swell / noise burst
+  const bufferSize = ctx.sampleRate * 0.25;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const noiseFilter = ctx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.setValueAtTime(1000, now);
+  noiseFilter.frequency.exponentialRampToValueAtTime(300, now + 0.25);
+
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.setValueAtTime(0.08, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+  noise.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(ctx.destination);
+
+  noise.start();
+  noise.stop(now + 0.25);
+
+  // Ringing metallic resonance
+  const ringOsc = ctx.createOscillator();
+  const ringGain = ctx.createGain();
+  ringOsc.type = 'sine';
+  ringOsc.frequency.setValueAtTime(440, now); // A4 ringing
+  
+  ringGain.gain.setValueAtTime(0.05, now);
+  ringGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+  ringOsc.connect(ringGain);
+  ringGain.connect(ctx.destination);
+
+  ringOsc.start();
+  ringOsc.stop(now + 0.5);
+}
+

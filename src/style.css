@@ -1654,7 +1654,7 @@ body:has(.dev-sandbox-bar) #app {
 
 /* Play card fly-in animation using custom properties from JS */
 .played-card {
-  animation: playCardAnim 0.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: playCardAnim 0.4s cubic-bezier(0.19, 1, 0.22, 1) both;
   transform-origin: center center;
 }
 
@@ -1667,5 +1667,203 @@ body:has(.dev-sandbox-bar) #app {
     opacity: 1;
     transform: translate(var(--play-offset-x, 0px), var(--play-offset-y, 0px)) rotate(var(--play-angle, 0deg)) scale(1);
   }
+}
+
+/* Wants Selector Modal styles */
+.wants-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 14, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.wants-modal-card {
+  width: 90%;
+  max-width: 520px;
+  max-height: 85vh;
+  background: rgba(22, 22, 28, 0.85);
+  border: 1px solid rgba(213, 178, 99, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-primary);
+  animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.wants-modal-card .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+}
+
+.wants-modal-card .modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--gold-accent);
+}
+
+.wants-modal-card .close-x {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.wants-modal-card .close-x:hover {
+  color: #ff4a5a;
+}
+
+.wants-modal-card .modal-section {
+  margin-bottom: 15px;
+}
+
+.wants-modal-card .section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.quick-suits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.quick-ranks-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .quick-ranks-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.specific-cards-scroll-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 220px;
+  padding-right: 4px;
+  margin-top: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* Custom scrollbar for cards grid */
+.specific-cards-scroll-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.specific-cards-scroll-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.specific-cards-scroll-grid::-webkit-scrollbar-thumb {
+  background: rgba(213, 178, 99, 0.3);
+  border-radius: 3px;
+}
+.specific-cards-scroll-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(213, 178, 99, 0.5);
+}
+
+.wants-quick-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  text-align: center;
+}
+
+.wants-quick-btn:hover {
+  border-color: var(--gold-accent);
+  background: rgba(213, 178, 99, 0.08);
+  color: var(--gold-accent);
+  transform: translateY(-1px);
+}
+
+.wants-quick-btn.suit-spades { color: #8e9bb0; }
+.wants-quick-btn.suit-clubs { color: #a1b0c7; }
+.wants-quick-btn.suit-diamonds { color: #ff5263; border-color: rgba(255, 82, 99, 0.15); }
+.wants-quick-btn.suit-hearts { color: #ff3b4e; border-color: rgba(255, 59, 78, 0.15); }
+
+.wants-grid-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  user-select: none;
+}
+
+.wants-grid-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--gold-accent);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+}
+
+.wants-grid-card .val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.wants-grid-card .st {
+  font-size: 0.8rem;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.wants-grid-card.suit-red {
+  color: #ff4a5a;
+  border-color: rgba(255, 74, 90, 0.12);
+}
+
+.wants-grid-card.suit-black {
+  color: #c4d1e6;
+  border-color: rgba(196, 209, 230, 0.12);
 }
 
